@@ -1,54 +1,56 @@
 import { supabase } from "../config/supabase";
 
-
-
 const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
 
-export async function uploadImageToDB(file: Express.Multer.File, filePath: string): Promise<string> {
-    try {
+export async function isImageSaved(fileName: string) {
+    const response = await supabase.storage
+        .from(BUCKET)
+        .list('libros', {
+            limit: 50,
+            offset: 0,
+            search: `${fileName}`
+        })
 
-        const { data: libroGuardado, error: errorList } = await supabase.storage
-            .from(BUCKET)
-            .list('libros', {
-                limit: 50,
-                offset: 0,
-                search: `${file.originalname}`
-            })
-
-        if (errorList) {
-            console.error("Error al listar archivos del storage:", errorList);
-            throw new Error("Error al listar archivos del storage:", errorList)
-        }
+    if (response.error) {
+        console.error('[Model Error] getABookModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
+    return response.data.length != 0
+}
 
 
-        if (libroGuardado.length == 0) {
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from(BUCKET)
-                .upload(filePath, file.buffer, {
-                    contentType: file.mimetype
-                })
 
-            if (uploadError) {
-                console.error("Error al subir a Supabase Storage:", uploadError);
-                throw new Error("No se pudo subir la imagen.");
-            }
-            const { data } = supabase.storage
-                .from(BUCKET)
-                .getPublicUrl(uploadData.path)
+export async function createImageModel(file: Express.Multer.File, filePath: string): Promise<string> {
 
-            if (!data) throw new Error("No se pudo recuperar la url de la imagen.");
+    const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(BUCKET + '/libros')
+        .upload(filePath, file.buffer, {
+            contentType: file.mimetype
+        })
 
-            const fullUrl = data.publicUrl
-            const baseUrl = 'https://hyclluqzwfzdmworaobk.supabase.co/storage/v1/object/public/imagenes-libros/';
+    if (uploadError) {
+        console.error('[Model Error] createImageModel:', uploadError)
+        throw new Error('DATABASE_ERROR')
+    }
+    const { data } = supabase.storage
+        .from(BUCKET + '/libros')
+        .getPublicUrl(uploadData.path)
 
-            const parts = fullUrl.split(baseUrl);
+    if (!data) throw new Error("No se pudo recuperar la url de la imagen.");
 
-            filePath = parts[1];
-        }
-        return filePath
+    return data.publicUrl
 
-    } catch (e: any) {
-        console.error("Error en subirImagen:", e.message);
-        throw new Error(e.message ?? "Error desconocido al subir imagen");
+}
+
+export async function deleteImageModel(filePath: string) {
+    const response = await supabase
+        .storage
+        .from(BUCKET)
+        .remove([`libros/${filePath}`])
+
+    console.log('Se elimino la imagen')
+    if (response.error) {
+        console.error('[Model Error] deleteImageModel:', response.error)
+        throw new Error('DATABASE_ERROR')
     }
 }

@@ -1,15 +1,19 @@
 import express from 'express'
 import multer from 'multer'
-import { uploadImage } from '../controller/Image.controller';
+import { createImageController, deleteImageController } from '../controller/Image.controller';
 
 const router = express.Router()
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage })
 
-router.post('/uploadimage',
+router.post('/image',
     upload.single('image'),
-    uploadImage
+    createImageController
+)
+
+router.delete('/image',
+    deleteImageController
 )
 
 export default router
