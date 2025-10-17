@@ -1,0 +1,115 @@
+import { Request, Response } from "express";
+import { createBookService, deleteBookService, getABookService, getAllBooksService, updateBookService } from "../services/book.services";
+import { Book, BookUpdate } from "../models/types";
+
+export async function getBooksController(_req: Request, res: Response) {
+    try {
+        const books = await getAllBooksService()
+        return res.status(200).json({ books });
+    }
+    catch (error: any) {
+        switch (error.message) {
+            case 'RESPONSE_ERROR':
+                return res.status(404).json({ error: 'Error: No Books were found.' });
+            case 'BOOK_FETCH_FAILED':
+                return res.status(500).json({ error: 'Failed to fetch books.' });
+            default:
+                console.error('[Controller Error] createBookController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+    }
+}
+
+export async function getABookController(req: Request, res: Response) {
+    try {
+        const { id } = req.params
+
+        const book = await getABookService(parseInt(id))
+        if (!book) return res.status(404).json({ message: 'No books were found.' })
+
+        return res.json({ book }).status(200);
+    } catch (error: any) {
+        switch (error.message) {
+            case 'RESPONSE_ERROR':
+                return res.status(404).json({ error: 'Error: No Book was found.' });
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'Invalid book data.' });
+            case 'BOOK_FETCH_FAILED':
+                return res.status(500).json({ error: 'Failed to fetch book.' });
+            default:
+                console.error('[Controller Error] createBookController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+    }
+}
+
+
+
+export async function createBookController(req: Request, res: Response) {
+
+    try {
+
+        const book: Book = req.body.book
+        if (!book) return res.status(400).json({ message: 'Bad request.' })
+
+        await createBookService(book)
+
+        return res.status(201).json({ message: 'Book created successfully' })
+    } catch (error: any) {
+        switch (error.message) {
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'Invalid book data.' });
+            case 'BOOK_SAVE_FAILED':
+                return res.status(500).json({ error: 'Failed to save book.' });
+            default:
+                console.error('[Controller Error] createBookController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+    }
+}
+
+
+export async function updateBookController(req: Request, res: Response) {
+    try {
+        const updateBook: BookUpdate = req.body
+        const result = await updateBookService(updateBook)
+
+        return res.status(204).json(result)
+    } catch (error: any) {
+
+        switch (error.message) {
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'Invalid book data.' });
+            case 'BOOK_DELETION_FAILED':
+                return res.status(500).json({ error: 'Failed to update the book.' });
+            default:
+                console.error('[Controller Error] createBookController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+
+
+    }
+}
+
+export async function deleteBookController(req: Request, res: Response) {
+    try {
+        const { id } = req.params
+
+        const result = await deleteBookService(parseInt(id))
+
+        return res.status(204).json(result)
+    } catch (error: any) {
+
+        switch (error.message) {
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'Invalid book data.' });
+            case 'BOOK_DELETION_FAILED':
+                return res.status(500).json({ error: 'Failed to delete the book.' });
+            default:
+                console.error('[Controller Error] createBookController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+
+
+    }
+}
