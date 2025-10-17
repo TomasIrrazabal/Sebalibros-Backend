@@ -13,7 +13,7 @@ app.use(express.json()) //  middleware que transforma la req.body a un json
 
 const apiV1 = `/api/v1`
 
-app.use(apiV1 + '/image', routerImages)
-app.use(apiV1 + '/book', routerLibros)
+app.use(apiV1, routerImages)
+app.use(apiV1, routerLibros)
 
 export default app
