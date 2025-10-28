@@ -3,12 +3,12 @@ import { createBookController, deleteBookController, getABookController, getBook
 
 const router = express.Router()
 
-router.get('/catalog',
+router.get('/books',
     getBooksController
 
 )
 
-router.get('/book/:id',
+router.get('/books/:id',
     getABookController
 )
 
