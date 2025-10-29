@@ -1,7 +1,8 @@
-import { supabase } from "../config/supabase";
+import { supabase } from "../../config/supabase";
 import type { Book, BookUpdate, BookWhitoutID } from "./types";
 
 const TABLE = 'books';
+const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
 
 
 export async function getAllBooksModel(): Promise<Book[]> {
@@ -39,7 +40,6 @@ export async function createBookModel(book: BookWhitoutID) {
         .insert(book)
 
     if (response.status !== 201) {
-        console.log(response.status)
         console.error('[Model Error] createBookModel:', response.error)
         throw new Error('DATABASE_ERROR')
     }
@@ -62,17 +62,49 @@ export async function updateBookModel(updateBook: BookUpdate) {
 
 
 export async function deleteBookModel(id: number) {
-    const response = await supabase
+    const { data: bookData, error: selectError } = await supabase
+        .from(TABLE)
+        .select('*')
+        .eq('id', id)
+        .single();
+
+
+    if (!bookData || selectError) {
+        console.error('[Model Error] deleteBookModel - select:', selectError);
+        throw new Error('BOOK_NOT_FOUND');
+    }
+    const { error: deleteError, status } = await supabase
         .from(TABLE)
         .delete()
         .eq('id', id)
 
-    if (response.status !== 204) {
-        console.error('[Model Error] deleteBookModel:', response.error)
+    if (deleteError || status !== 204) {
+        console.error('[Model Error] deleteBookModel:', deleteError)
         throw new Error('DATABASE_ERROR')
+    }
+
+    const { error: storageError } = await supabase
+        .storage
+        .from(BUCKET)
+        .remove([`libros/${bookData.image}`])
+
+
+    if (storageError) {
+        console.error('[Model Error] deleteBookModel - storage:', storageError);
     }
     return true
 }
 
 
 
+export async function deleteImageModel(filePath: string) {
+    const response = await supabase
+        .storage
+        .from(BUCKET)
+        .remove([`libros/${filePath}`])
+
+    if (response.error) {
+        console.error('[Model Error] deleteImageModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
+}

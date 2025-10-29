@@ -5,14 +5,14 @@ export type Book = {
     description: string,
     price: number,
     author: string,
-    image?: string,
+    image: string,
     dateUpload: Date,
-    format?: string,
-    bookBinding?: string,
+    format: string,
+    bookBinding: string,
     isbn: string,
-    resume?: string,
-    pages?: number,
-    especiality?: string,
+    resume: string,
+    pages: number,
+    especiality: string,
     state: Status
 }
 

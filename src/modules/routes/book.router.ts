@@ -1,5 +1,7 @@
 import express from 'express'
-import { createBookController, deleteBookController, getABookController, getBooksController, updateBookController } from '../controller/book.controller'
+import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from '../controller/book.controller'
+import { uploadImageMiddleware } from '../../middleware/image.middleware'
+import { uploadSingleImage } from '../../config/multerConfig'
 
 const router = express.Router()
 
@@ -15,10 +17,14 @@ router.get('/books/:id',
 
 
 router.post('/admin/book',
+    uploadSingleImage,
+    uploadImageMiddleware,
     createBookController
 )
 
 router.patch('/admin/book/',
+    uploadSingleImage,
+    uploadImageMiddleware,
     updateBookController
 )
 
@@ -30,15 +36,15 @@ router.delete('/admin/book/:id',
 
 
 
+router.delete('/image',
+    deleteImageController
+)
+
 // router.post('/contact', (req, res) => {
 //     const { email } = req.body
 //     res.json({ email: email })
 
 // })
 
-
-router.use((req, res) => {
-    res.status(404).json({ mensaje: 'Ruta no encontrada' });
-});
 
 export default router

@@ -1,4 +1,5 @@
-import { createBookModel, deleteBookModel, getABookModel, getAllBooksModel, updateBookModel } from "../models/book.model";
+import { isImageSaved } from "../../utils/utils";
+import { createBookModel, deleteBookModel, deleteImageModel, getABookModel, getAllBooksModel, updateBookModel } from "../models/book.model";
 import { Book, BookUpdate, BookWhitoutID } from "../models/types";
 
 export async function getAllBooksService(): Promise<Book[]> {
@@ -76,7 +77,7 @@ export async function deleteBookService(id: number) {
     try {
         await deleteBookModel(id)
     } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR') {
+        if (error.message === 'DATABASE_ERROR' || error.mensaje === 'BOOK_NOT_FOUND') {
             throw new Error('BOOK_DELETION_FAILED')
         }
         throw error
@@ -84,4 +85,21 @@ export async function deleteBookService(id: number) {
 
     return { message: 'Success' };
 
+}
+
+export async function deleteImageService(filePath: string) {
+    if (!filePath) {
+        throw new Error('VALIDATION_ERROR')
+    }
+    try {
+        if (await isImageSaved(filePath)) {
+            await deleteImageModel(filePath)
+        }
+
+    } catch (error: any) {
+        if (error.message === 'DATABASE_ERROR') {
+            throw new Error('IMAGE_DELETE_FAILED')
+        }
+        throw error
+    }
 }

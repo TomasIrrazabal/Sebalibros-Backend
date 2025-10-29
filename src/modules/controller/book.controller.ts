@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createBookService, deleteBookService, getABookService, getAllBooksService, updateBookService } from "../services/book.services";
-import { Book, BookUpdate } from "../models/types";
+import { createBookService, deleteBookService, deleteImageService, getABookService, getAllBooksService, updateBookService } from "../services/book.services";
+import { BookUpdate, BookWhitoutID } from "../models/types";
 
 export async function getBooksController(_req: Request, res: Response) {
     try {
@@ -49,8 +49,12 @@ export async function createBookController(req: Request, res: Response) {
 
     try {
 
-        const book: Book = req.body.book
+        const book: BookWhitoutID = req.body;
+
         if (!book) return res.status(400).json({ message: 'Bad request.' })
+        if (!book.author || !book.price || !book.title || !book.image || !book.isbn) {
+            return res.status(400).json({ message: 'Bad request.' })
+        }
 
         await createBookService(book)
 
@@ -112,4 +116,30 @@ export async function deleteBookController(req: Request, res: Response) {
 
 
     }
+}
+
+
+export async function deleteImageController(req: Request, res: Response) {
+    try {
+        const { filePath } = req.body
+        if (!filePath) {
+            return res.status(400).json({ message: 'Bad request.' })
+        }
+
+        await deleteImageService(filePath)
+
+        return res.status(201).json({ message: 'Image deleted' })
+
+    } catch (error: any) {
+        switch (error.message) {
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'Invalid Image data.' });
+            case 'IMAGE_DELETE_FAILED':
+                return res.status(500).json({ error: 'Failed to delete Image.' });
+            default:
+                console.error('[Controller Error] createBookController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+    }
+
 }
