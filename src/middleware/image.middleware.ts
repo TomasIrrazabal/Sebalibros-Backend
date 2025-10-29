@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { randomUUID } from 'node:crypto';
 import path from 'node:path'
 import { supabase } from '../config/supabase';
+import { generateHashedImageName } from '../utils/image.utils';
 
 const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
 
@@ -14,8 +15,9 @@ export async function uploadImageMiddleware(req: Request, res: Response, next: N
             return next()
         }
 
-        const ext = path.extname(file.originalname) || '.png';
-        const fileName = `${randomUUID()}${ext}`;
+        // const ext = path.extname(file.originalname) || '.png';
+        // const fileName = `${randomUUID()}${ext}`;
+        const fileName = generateHashedImageName(file)
 
         const objectPath = `libros/${fileName}`;
 
