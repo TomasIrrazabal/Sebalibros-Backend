@@ -9,12 +9,9 @@ export async function uploadImageMiddleware(req: Request, res: Response, next: N
         const { file } = req;
 
         if (!file) {
-            // console.log('[uploadImageMiddleware] No file received, skipping upload.')
             return next()
         }
 
-        // const ext = path.extname(file.originalname) || '.png';
-        // const fileName = `${randomUUID()}${ext}`;
         const fileName = generateHashedImageName(file)
 
         const objectPath = `libros/${fileName}`;

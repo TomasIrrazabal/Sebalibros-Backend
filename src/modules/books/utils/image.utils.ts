@@ -5,13 +5,13 @@ import { supabase } from "../../../config/supabase";
 const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
 
 
-export async function isImageSaved(fileName: string) {
+export async function isImageSaved(originalImage: string) {
     const response = await supabase.storage
         .from(BUCKET)
         .list('libros', {
             limit: 50,
             offset: 0,
-            search: `${fileName}`
+            search: `${originalImage}`
         })
 
     if (response.error) {

@@ -88,13 +88,13 @@ export async function deleteBookService(id: number) {
 
 }
 
-export async function deleteImageService(filePath: string) {
-    if (!filePath) {
+export async function deleteImageService(originalImage: string) {
+    if (!originalImage) {
         throw new Error('VALIDATION_ERROR')
     }
     try {
-        if (await isImageSaved(filePath)) {
-            await deleteImageModel(filePath)
+        if (await isImageSaved(originalImage)) {
+            await deleteImageModel(originalImage)
         }
 
     } catch (error: any) {

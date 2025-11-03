@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { createBookService, deleteBookService, deleteImageService, getABookService, getAllBooksService, updateBookService } from "./book.services";
 import { BookUpdate, BookWhitoutID } from "./types";
 
@@ -75,8 +75,9 @@ export async function createBookController(req: Request, res: Response) {
 
 export async function updateBookController(req: Request, res: Response) {
     try {
-        const updateBook: BookUpdate = req.body
-        const result = await updateBookService(updateBook)
+        const { originalImage, ...rest } = req.body;
+        const updatedBook: BookUpdate = rest;
+        const result = await updateBookService(updatedBook);
 
         return res.status(204).json(result)
     } catch (error: any) {
@@ -119,16 +120,17 @@ export async function deleteBookController(req: Request, res: Response) {
 }
 
 
-export async function deleteImageController(req: Request, res: Response) {
+export async function deleteImageController(req: Request, res: Response, next: NextFunction) {
     try {
-        const { filePath } = req.body
-        if (!filePath) {
-            return res.status(400).json({ message: 'Bad request.' })
+        const { originalImage, image } = req.body;
+
+        if (!originalImage && !image) {
+            return next()
         }
 
-        await deleteImageService(filePath)
+        await deleteImageService(originalImage)
 
-        return res.status(201).json({ message: 'Image deleted' })
+        return next();
 
     } catch (error: any) {
         switch (error.message) {
