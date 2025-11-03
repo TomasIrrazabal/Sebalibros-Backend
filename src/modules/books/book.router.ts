@@ -1,6 +1,6 @@
 import express from 'express'
-import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from '../controller/book.controller'
-import { uploadImageMiddleware } from '../../middleware/image.middleware'
+import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from './controller/book.controller'
+import { uploadImageMiddleware } from './middleware/image.middleware'
 import { uploadSingleImage } from '../../config/multerConfig'
 
 const router = express.Router()

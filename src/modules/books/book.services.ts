@@ -1,5 +1,5 @@
 
-import { isImageSaved } from "../../utils/image.utils";
+import { isImageSaved } from "../utils/image.utils";
 import { createBookModel, deleteBookModel, deleteImageModel, getABookModel, getAllBooksModel, updateBookModel } from "../models/book.model";
 import { Book, BookUpdate, BookWhitoutID } from "../models/types";
 

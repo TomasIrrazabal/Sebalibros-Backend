@@ -1,6 +1,6 @@
 import express from "express"
 import cors from 'cors'
-import routerLibros from "./modules/routes/book.router"
+import routerLibros from "./modules/books/book.router"
 import { corsConfig } from "./config/cors"
 
 const app = express()
