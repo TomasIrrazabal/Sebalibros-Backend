@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import { supabase } from "../config/supabase";
+import { supabase } from "../../../config/supabase";
 
 
 const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
