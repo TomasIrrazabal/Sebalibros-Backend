@@ -1,4 +1,4 @@
-import { supabase } from "../../../config/supabase";
+import { supabase } from "../../config/supabase";
 import type { Book, BookUpdate, BookWhitoutID } from "./types";
 
 const TABLE = 'books';

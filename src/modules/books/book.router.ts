@@ -1,5 +1,5 @@
 import express from 'express'
-import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from './controller/book.controller'
+import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from './book.controller'
 import { uploadImageMiddleware } from './middleware/image.middleware'
 import { uploadSingleImage } from '../../config/multerConfig'
 

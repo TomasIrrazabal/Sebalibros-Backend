@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { randomUUID } from 'node:crypto';
-import path from 'node:path'
 import { supabase } from '../../../config/supabase';
 import { generateHashedImageName } from '../utils/image.utils';
 

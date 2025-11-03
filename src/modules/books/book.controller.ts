@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createBookService, deleteBookService, deleteImageService, getABookService, getAllBooksService, updateBookService } from "../services/book.services";
-import { BookUpdate, BookWhitoutID } from "../models/types";
+import { createBookService, deleteBookService, deleteImageService, getABookService, getAllBooksService, updateBookService } from "./book.services";
+import { BookUpdate, BookWhitoutID } from "./types";
 
 export async function getBooksController(_req: Request, res: Response) {
     try {
