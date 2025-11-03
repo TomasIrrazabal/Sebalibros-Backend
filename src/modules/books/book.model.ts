@@ -97,11 +97,11 @@ export async function deleteBookModel(id: number) {
 
 
 
-export async function deleteImageModel(filePath: string) {
+export async function deleteImageModel(originalImage: string) {
     const response = await supabase
         .storage
         .from(BUCKET)
-        .remove([`libros/${filePath}`])
+        .remove([`libros/${originalImage}`])
 
     if (response.error) {
         console.error('[Model Error] deleteImageModel:', response.error)

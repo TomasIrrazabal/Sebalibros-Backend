@@ -25,6 +25,7 @@ router.post('/admin/book',
 router.patch('/admin/book/',
     uploadSingleImage,
     uploadImageMiddleware,
+    deleteImageController,
     updateBookController
 )
 
