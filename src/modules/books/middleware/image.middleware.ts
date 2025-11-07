@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { supabase } from '../../../config/supabase';
+import { supabase } from '../../../db/supabase';
 import { generateHashedImageName } from '../utils/image.utils';
 
 const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
