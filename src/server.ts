@@ -1,10 +1,10 @@
 import express from "express"
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import swaggerUi from 'swagger-ui-express';
 
 import bookRouter from "./modules/books/book.router"
-import UserRouter from "./modules/users/user.router"
+import userRouter from "./modules/users/user.router"
+import docsRouter from "./modules/docs/docs.router"
 import { corsConfig } from "./config/cors"
 import { swaggerSpec } from "./modules/docs/swagger";
 
@@ -22,11 +22,10 @@ const apiV = `/api/v1`
 
 // Routers
 
+app.use('/docs', docsRouter)
 
 app.use(apiV, bookRouter)
-app.use(apiV, UserRouter)
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(apiV, userRouter)
 
 
 app.use((_req, res) => {
