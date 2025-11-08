@@ -18,8 +18,8 @@ export type Book = {
 
 
 export enum Status {
-    active = "activo",
-    inactive = "inactivo"
+    active = "active",
+    inactive = "inactive"
 }
 
 export type BookUpdate = {

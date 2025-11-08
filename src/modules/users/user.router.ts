@@ -35,7 +35,7 @@ router.post('/admin/createuser',
 
 )
 
-router.post('/logout', (req, res) => {
+router.get('/logout', (req, res) => {
     res.clearCookie('auth', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
     return res.status(200).json({ message: 'Logged out' });
 });
