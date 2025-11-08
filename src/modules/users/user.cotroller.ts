@@ -41,7 +41,7 @@ export async function loginUserController(req: Request, res: Response) {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 10
+            maxAge: 1000 * 60 * 60 * 24 * 7
         })
 
         return res.status(201).json({ message: 'Logged in' })

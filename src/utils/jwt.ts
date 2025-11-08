@@ -14,7 +14,7 @@ declare global {
 
 export function generateJWT(payload: JwtPayload) {
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-        expiresIn: '10m'
+        expiresIn: '7d'
     })
     return token
 }
