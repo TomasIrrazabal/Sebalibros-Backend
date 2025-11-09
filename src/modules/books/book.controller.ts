@@ -85,7 +85,7 @@ export async function updateBookController(req: Request, res: Response) {
         switch (error.message) {
             case 'VALIDATION_ERROR':
                 return res.status(400).json({ error: 'Invalid book data.' });
-            case 'BOOK_DELETION_FAILED':
+            case 'BOOK_UPDATE_FAILED':
                 return res.status(500).json({ error: 'Failed to update the book.' });
             default:
                 console.error('[Controller Error] createBookController:', error)

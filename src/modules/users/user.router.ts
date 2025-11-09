@@ -1,8 +1,9 @@
 import express from "express"
 import { body } from "express-validator"
 import { handleInputErrors } from "./middleware/user.middleware"
-import { createUserController, loginUserController } from "./user.cotroller"
-import { requireAuth, getUser } from "../../utils/jwt"
+import { createUserController, getAdminUserController, getallusersController, getUserController, loginUserController, updateAdminUserController, updateUserController } from "./user.cotroller"
+import { requireAuth, requireRole } from "./utils/jwt"
+import { Role } from "./types"
 
 const router = express.Router()
 
@@ -20,7 +21,6 @@ router.post('/login',
 )
 
 router.post('/admin/createuser',
-    requireAuth,
     body('name')
         .notEmpty()
         .withMessage('Name cannot be empty.'),
@@ -30,9 +30,10 @@ router.post('/admin/createuser',
     body('password')
         .isLength({ min: 8 })
         .withMessage('The password is too short, minimum 8 characters.'),
+    requireAuth,
+    requireRole(Role.admin),
     handleInputErrors,
     createUserController
-
 )
 
 router.get('/logout', (req, res) => {
@@ -42,7 +43,37 @@ router.get('/logout', (req, res) => {
 
 router.get('/user',
     requireAuth,
-    getUser
+    requireRole(Role.editor),
+    getUserController
 )
 
+router.patch('/user',
+    body('name')
+        .notEmpty()
+        .withMessage('Name cannot be empty.'),
+    body('email')
+        .isEmail()
+        .withMessage('Invalid email.'),
+    requireAuth,
+    requireRole(Role.editor),
+    updateUserController)
+
+
+router.get('/allusers',
+    requireAuth,
+    requireRole(Role.admin),
+    getallusersController
+)
+
+router.get('/admin/user/:id',
+    requireAuth,
+    requireRole(Role.admin),
+    getAdminUserController
+)
+
+router.patch('/admin/user/',
+    requireAuth,
+    requireRole(Role.admin),
+    updateAdminUserController
+)
 export default router;
