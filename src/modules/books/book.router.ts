@@ -2,7 +2,7 @@ import express from 'express'
 import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from './book.controller'
 import { uploadImageMiddleware } from './middleware/image.middleware'
 import { uploadSingleImage } from '../../config/multerConfig'
-import { requireAuth } from '../../utils/jwt'
+import { requireAuth } from '../users/utils/jwt'
 
 const router = express.Router()
 

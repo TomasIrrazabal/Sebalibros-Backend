@@ -1,5 +1,5 @@
 import { supabase } from "../../db/supabase";
-import { UserWithoutId } from "./types";
+import { User, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
 
 const TABLE = 'users'
 
@@ -13,5 +13,86 @@ export async function createUserModel(user: UserWithoutId) {
         throw new Error('DATABASE_ERROR')
     }
 
+    return true
+}
+
+export async function getUserModel(id: number): Promise<UserWithoutPass> {
+    const response = await supabase
+        .from(TABLE)
+        .select('name,email,role')
+        .eq('id', id)
+        .maybeSingle()
+
+    if (response.status !== 200) {
+        console.error('[Model Error] getUserModel:')
+        throw new Error('DATABASE_ERROR')
+    }
+    return response.data as UserWithoutPass;
+}
+
+export async function updateUserModel(user: UserUpdateData) {
+    const { id, ...rest } = user
+    const response = await supabase
+        .from(TABLE)
+        .update(rest)
+        .eq('id', id)
+
+    if (response.error) {
+        console.error('[Model Error] updateUserModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
+    const responseSelect = await supabase
+        .from(TABLE)
+        .select('name,email')
+        .eq('id', id)
+        .maybeSingle()
+
+    if (responseSelect.status !== 200) {
+        console.error('[Model Error] updateUserModel:')
+        throw new Error('DATABASE_ERROR')
+    }
+
+    return responseSelect.data as UserWithoutPass;
+}
+
+export async function getallusersModel() {
+    const response = await supabase
+        .from(TABLE)
+        .select('*')
+        .order('id', { ascending: true })
+
+    if (response.status !== 200) {
+        console.error('[Model Error] getallusersModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
+    return response.data as User[];
+}
+
+export async function getABookModel(id: number) {
+    const response = await supabase
+        .from(TABLE)
+        .select('id,name,email,role')
+        .eq('id', id)
+        .single()
+
+    if (response.status !== 200) {
+        console.error('[Model Error] getABookModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
+
+    return response.data as UserWithoutPass;
+}
+
+export async function updateAdminUserModel(user: any) {
+    console.log(user)
+    const response = await supabase
+        .from(TABLE)
+        .update(user)
+        .eq('id', user.id)
+
+    if (response.error) {
+        console.error('[Model Error] updateAdminUserModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
     return true
 }

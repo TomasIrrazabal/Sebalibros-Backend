@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
-import { UserWithoutPass } from '../modules/users/types'
-import { getUserByIdWithoutPass } from '../modules/users/utils/user.utils'
+import { Role, UserWithoutPass } from '../types'
+
 
 declare global {
     namespace Express {
@@ -40,6 +40,15 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const getUser = async (req: Request, res: Response) => {
-    res.send(req.user);
-};
+const rank: Record<Role, number> = { editor: 1, admin: 2 };
+
+export function requireRole(minRole: Role) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const userRole = req.user?.role;
+        if (!userRole) return res.status(401).json({ error: 'No autenticado' });
+        if (rank[userRole] < rank[minRole]) {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+        return next();
+    };
+}
