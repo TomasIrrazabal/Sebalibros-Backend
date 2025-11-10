@@ -1,5 +1,5 @@
 import { id, JwtPayload, User, UserAdminWithoutPass, UserLogin, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
-import { createUserModel, getABookModel, getallusersModel, getUserModel, updateAdminUserModel, updateUserModel } from "./user.model";
+import { createUserModel, getABookModel, getallusersModel, getUserModel, updateAdminUserModel, updatePasswordModel, updateUserModel } from "./user.model";
 import { checkPassword, hashPassword } from "./utils/auth";
 import { generateJWT } from "./utils/jwt";
 import { userExist } from "./utils/user.utils";
@@ -102,6 +102,33 @@ export async function updateUserService(user: UserUpdateData) {
     } catch (error: any) {
         if (error.message === 'DATABASE_ERROR') {
             throw new Error('USER_UPDATE_FAILED')
+        }
+        throw error
+    }
+}
+
+export async function updatePasswordService(currentPassword: string, newPassword: string, user: UserWithoutPass) {
+    try {
+        if (!user.email) {
+            throw new Error('VALIDATION_ERROR')
+        }
+        const userResponse = await userExist(user.email)
+
+        if (!userResponse) {
+            throw new Error("USER_NOT_EXIST");
+        }
+
+        const isPasswordCorrect = await checkPassword(currentPassword, userResponse.password)
+
+        if (!isPasswordCorrect) {
+            throw new Error("INVALID_PASSWORD");
+        }
+        newPassword = await hashPassword(newPassword)
+        const data = await updatePasswordModel(newPassword, user.id)
+        return data
+    } catch (error: any) {
+        if (error.message === 'DATABASE_ERROR') {
+            throw new Error('PASSWORD_UPDATE_FAILED')
         }
         throw error
     }
