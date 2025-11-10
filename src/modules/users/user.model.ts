@@ -80,7 +80,7 @@ export async function getallusersModel() {
     return response.data as User[];
 }
 
-export async function getABookModel(id: number) {
+export async function getAdminUserModel(id: number) {
     const response = await supabase
         .from(TABLE)
         .select('id,name,email,role')
@@ -96,7 +96,6 @@ export async function getABookModel(id: number) {
 }
 
 export async function updateAdminUserModel(user: any) {
-    console.log(user)
     const response = await supabase
         .from(TABLE)
         .update(user)
@@ -106,5 +105,21 @@ export async function updateAdminUserModel(user: any) {
         console.error('[Model Error] updateAdminUserModel:', response.error)
         throw new Error('DATABASE_ERROR')
     }
+    return true
+}
+
+
+export async function deleteAdminUserModel(id: number) {
+
+    const { error: deleteError, status } = await supabase
+        .from(TABLE)
+        .delete()
+        .eq('id', id)
+
+    if (deleteError || status !== 204) {
+        console.error('[Model Error] deleteAdminUserModel:', deleteError)
+        throw new Error('DATABASE_ERROR')
+    }
+
     return true
 }

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserAdminWithoutPass, UserLogin, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
-import { createUserService, getAdminUserService, getallusersService, getUserService, loginUserService, updateAdminUserService, updatePasswordService, updateUserService } from "./user.services";
+import { createUserService, deleteAdminUserService, getAdminUserService, getallusersService, getUserService, loginUserService, updateAdminUserService, updatePasswordService, updateUserService } from "./user.services";
 
 export async function createUserController(req: Request, res: Response) {
     try {
@@ -195,13 +195,13 @@ export async function getAdminUserController(req: Request, res: Response) {
     } catch (error: any) {
         switch (error.message) {
             case 'RESPONSE_ERROR':
-                return res.status(404).json({ error: 'Error: No Book was found.' });
+                return res.status(404).json({ error: 'Error: No user was found.' });
             case 'VALIDATION_ERROR':
-                return res.status(400).json({ error: 'Invalid book data.' });
-            case 'BOOK_FETCH_FAILED':
-                return res.status(500).json({ error: 'Failed to fetch book.' });
+                return res.status(400).json({ error: 'Invalid user data.' });
+            case 'USER_FETCH_FAILED':
+                return res.status(500).json({ error: 'Failed to fetch user.' });
             default:
-                console.error('[Controller Error] createBookController:', error)
+                console.error('[Controller Error] getAdminUserController:', error)
                 return res.status(500).json({ error: 'Internal Server Error' })
         }
     }
@@ -210,7 +210,6 @@ export async function getAdminUserController(req: Request, res: Response) {
 
 export async function updateAdminUserController(req: Request, res: Response) {
     try {
-        console.log(req.body)
         const user: UserAdminWithoutPass = req.body;
         const result = await updateAdminUserService(user);
 
@@ -229,4 +228,30 @@ export async function updateAdminUserController(req: Request, res: Response) {
 
 
     }
+}
+
+export async function deleteAdminUserController(req: Request, res: Response) {
+    try {
+        const { id } = req.params
+
+        const result = await deleteAdminUserService(parseInt(id))
+
+        return res.status(204).json(result)
+
+    } catch (error: any) {
+
+        switch (error.message) {
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'Invalid user data.' });
+            case 'USER_DELETION_FAILED':
+                return res.status(500).json({ error: 'Failed to delete the user.' });
+            default:
+                console.error('[Controller Error] deleteAdminUserController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+
+
+    }
+
+
 }

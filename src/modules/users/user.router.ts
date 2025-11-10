@@ -1,7 +1,7 @@
 import express from "express"
 import { body } from "express-validator"
 import { handleInputErrors } from "./middleware/user.middleware"
-import { createUserController, getAdminUserController, getallusersController, getUserController, loginUserController, updateAdminUserController, updatePasswordController, updateUserController } from "./user.cotroller"
+import { createUserController, deleteAdminUserController, getAdminUserController, getallusersController, getUserController, loginUserController, updateAdminUserController, updatePasswordController, updateUserController } from "./user.cotroller"
 import { requireAuth, requireRole } from "./utils/jwt"
 import { Role } from "./types"
 
@@ -87,5 +87,14 @@ router.post('/admin/createuser',
     requireRole(Role.admin),
     handleInputErrors,
     createUserController
+)
+
+router.delete('/admin/user/:id',
+    body('id')
+        .notEmpty()
+        .withMessage('Id cannot be empty'),
+    requireAuth,
+    requireRole(Role.admin),
+    deleteAdminUserController
 )
 export default router;
