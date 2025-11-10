@@ -1,13 +1,13 @@
 import express from "express"
 import { body } from "express-validator"
 import { handleInputErrors } from "./middleware/user.middleware"
-import { createUserController, deleteAdminUserController, getAdminUserController, getallusersController, getUserController, loginUserController, updateAdminUserController, updatePasswordController, updateUserController } from "./user.cotroller"
+import { createUserController, deleteAdminUserController, getAdminUserController, getallusersController, getUserController, loginUserController, updateAdminUserController, updatePasswordController, updateUserController } from "./user.controller"
 import { requireAuth, requireRole } from "./utils/jwt"
 import { Role } from "./types"
 
 const router = express.Router()
 
-
+// Public (todos los usuarios)
 // Login
 router.post('/login',
     body('email')
@@ -27,14 +27,15 @@ router.get('/logout', (req, res) => {
     return res.status(200).json({ message: 'Logged out' });
 });
 
-// Get user to auth
+// Editor/Admin
+// Get my user (auth)
 router.get('/user',
     requireAuth,
     requireRole(Role.editor),
     getUserController
 )
 
-// Update my acount
+// Update my account (auth)
 router.patch('/user',
     body('name')
         .notEmpty()
@@ -51,29 +52,30 @@ router.patch('/password',
     updatePasswordController
 )
 
-// Get all users as an admin
-router.get('/allusers',
+// Admin Only
+// Get all users
+router.get('/admin/user',
     requireAuth,
     requireRole(Role.admin),
     getallusersController
 )
 
-// Get 1 user as an admin
+// Get one user by id
 router.get('/admin/user/:id',
     requireAuth,
     requireRole(Role.admin),
     getAdminUserController
 )
 
-// patch a user as an admin
+// Update a user
 router.patch('/admin/user/',
     requireAuth,
     requireRole(Role.admin),
     updateAdminUserController
 )
 
-// post (create) user as admin
-router.post('/admin/createuser',
+// Create a user
+router.post('/admin/user',
     body('name')
         .notEmpty()
         .withMessage('Name cannot be empty.'),

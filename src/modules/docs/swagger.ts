@@ -16,6 +16,7 @@ const swaggerDefinition: OAS3Definition = {
     tags: [
         { name: 'Books', description: 'Books management' },
         { name: 'Users', description: 'Authentication and users' },
+        { name: 'Admin', description: 'Admin-only operations' },
     ],
     components: {
         securitySchemes: {
@@ -120,6 +121,48 @@ const swaggerDefinition: OAS3Definition = {
                 },
                 required: ['name', 'email', 'password'],
             },
+            UserResponse: {
+                type: 'object',
+                properties: { user: { $ref: '#/components/schemas/User' } },
+            },
+            UsersResponse: {
+                type: 'object',
+                properties: { users: { type: 'array', items: { $ref: '#/components/schemas/User' } } },
+            },
+            UpdateUserRequest: {
+                type: 'object',
+                properties: {
+                    name: { type: 'string' },
+                    email: { type: 'string', format: 'email' },
+                },
+            },
+            UpdatePasswordRequest: {
+                type: 'object',
+                properties: {
+                    currentPassword: { type: 'string' },
+                    newPassword: { type: 'string', minLength: 8 },
+                },
+                required: ['currentPassword', 'newPassword'],
+            },
+            UpdateAdminUserRequest: {
+                type: 'object',
+                properties: {
+                    id: { type: 'number' },
+                    name: { type: 'string' },
+                    email: { type: 'string', format: 'email' },
+                    role: { type: 'string', enum: ['admin', 'editor'] },
+                    resetPass: { type: 'boolean' },
+                },
+                required: ['id'],
+            },
+            DeleteImageRequest: {
+                type: 'object',
+                properties: {
+                    originalImage: { type: 'string' },
+                    image: { type: 'string' },
+                },
+                required: ['originalImage'],
+            },
         },
     },
     paths: {
@@ -157,7 +200,7 @@ const swaggerDefinition: OAS3Definition = {
         },
         '/admin/book': {
             post: {
-                tags: ['Books'],
+                tags: ['Admin'],
                 summary: 'Create book',
                 security: [{ cookieAuth: [] }],
                 requestBody: {
@@ -173,7 +216,7 @@ const swaggerDefinition: OAS3Definition = {
                 },
             },
             patch: {
-                tags: ['Books'],
+                tags: ['Admin'],
                 summary: 'Update book',
                 security: [{ cookieAuth: [] }],
                 requestBody: {
@@ -192,7 +235,7 @@ const swaggerDefinition: OAS3Definition = {
         },
         '/admin/book/{id}': {
             delete: {
-                tags: ['Books'],
+                tags: ['Admin'],
                 summary: 'Delete book',
                 security: [{ cookieAuth: [] }],
                 parameters: [
@@ -206,9 +249,13 @@ const swaggerDefinition: OAS3Definition = {
         },
         '/image': {
             delete: {
-                tags: ['Books'],
+                tags: ['Admin'],
                 summary: 'Delete associated image',
                 security: [{ cookieAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: { 'application/json': { schema: { $ref: '#/components/schemas/DeleteImageRequest' } } },
+                },
                 responses: {
                     200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/MessageResponse' } } } },
                     401: { description: 'Unauthorized' },
@@ -229,19 +276,6 @@ const swaggerDefinition: OAS3Definition = {
                 },
             },
         },
-        '/admin/createuser': {
-            post: {
-                tags: ['Users'],
-                summary: 'Create user',
-                security: [{ cookieAuth: [] }],
-                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateUserRequest' } } } },
-                responses: {
-                    201: { description: 'User created', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
-                    400: { description: 'Validation error' },
-                    401: { description: 'Unauthorized' },
-                },
-            },
-        },
         '/logout': {
             get: {
                 tags: ['Users'],
@@ -258,6 +292,88 @@ const swaggerDefinition: OAS3Definition = {
                 security: [{ cookieAuth: [] }],
                 responses: {
                     200: { description: 'User', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
+                    401: { description: 'Unauthorized' },
+                },
+            },
+            patch: {
+                tags: ['Users'],
+                summary: 'Update my account',
+                security: [{ cookieAuth: [] }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/UpdateUserRequest' } } } },
+                responses: {
+                    200: { description: 'Updated user', content: { 'application/json': { schema: { $ref: '#/components/schemas/UserResponse' } } } },
+                    400: { description: 'Bad request' },
+                    401: { description: 'Unauthorized' },
+                    409: { description: 'Email already exist' },
+                },
+            },
+        },
+        '/password': {
+            patch: {
+                tags: ['Users'],
+                summary: 'Update my password',
+                security: [{ cookieAuth: [] }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/UpdatePasswordRequest' } } } },
+                responses: {
+                    200: { description: 'Password changed', content: { 'application/json': { schema: { $ref: '#/components/schemas/MessageResponse' } } } },
+                    400: { description: 'Bad request' },
+                    401: { description: 'Unauthorized' },
+                    409: { description: 'Invalid password or user not found' },
+                },
+            },
+        },
+        '/admin/user': {
+            get: {
+                tags: ['Admin'],
+                summary: 'Get all users (admin)',
+                security: [{ cookieAuth: [] }],
+                responses: {
+                    200: { description: 'Users list', content: { 'application/json': { schema: { $ref: '#/components/schemas/UsersResponse' } } } },
+                    401: { description: 'Unauthorized' },
+                },
+            },
+            post: {
+                tags: ['Admin'],
+                summary: 'Create user',
+                security: [{ cookieAuth: [] }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateUserRequest' } } } },
+                responses: {
+                    201: { description: 'User created', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
+                    400: { description: 'Validation error' },
+                    401: { description: 'Unauthorized' },
+                },
+            },
+            patch: {
+                tags: ['Admin'],
+                summary: 'Update a user (admin)',
+                security: [{ cookieAuth: [] }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/UpdateAdminUserRequest' } } } },
+                responses: {
+                    200: { description: 'Updated', content: { 'application/json': { schema: { $ref: '#/components/schemas/MessageResponse' } } } },
+                    400: { description: 'Validation error' },
+                    401: { description: 'Unauthorized' },
+                },
+            },
+        },
+        '/admin/user/{id}': {
+            get: {
+                tags: ['Admin'],
+                summary: 'Get a user (admin)',
+                security: [{ cookieAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'User', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
+                    401: { description: 'Unauthorized' },
+                    404: { description: 'Not found' },
+                },
+            },
+            delete: {
+                tags: ['Admin'],
+                summary: 'Delete a user (admin)',
+                security: [{ cookieAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    204: { description: 'Deleted' },
                     401: { description: 'Unauthorized' },
                 },
             },

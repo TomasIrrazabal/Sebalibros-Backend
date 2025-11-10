@@ -27,7 +27,7 @@ export async function getABookController(req: Request, res: Response) {
         const book = await getABookService(parseInt(id))
         if (!book) return res.status(404).json({ message: 'No books were found.' })
 
-        return res.json({ book }).status(200);
+        return res.status(200).json({ book });
     } catch (error: any) {
         switch (error.message) {
             case 'RESPONSE_ERROR':
@@ -79,7 +79,7 @@ export async function updateBookController(req: Request, res: Response) {
         const updatedBook: BookUpdate = rest;
         const result = await updateBookService(updatedBook);
 
-        return res.status(204).json(result)
+        return res.status(200).json(result)
     } catch (error: any) {
 
         switch (error.message) {
@@ -100,9 +100,9 @@ export async function deleteBookController(req: Request, res: Response) {
     try {
         const { id } = req.params
 
-        const result = await deleteBookService(parseInt(id))
+        await deleteBookService(parseInt(id))
 
-        return res.status(204).json(result)
+        return res.status(204).send()
     } catch (error: any) {
 
         switch (error.message) {
