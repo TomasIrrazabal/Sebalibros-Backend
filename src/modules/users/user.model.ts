@@ -55,6 +55,18 @@ export async function updateUserModel(user: UserUpdateData) {
     return responseSelect.data as UserWithoutPass;
 }
 
+export async function updatePasswordModel(newPassword: string, id: number) {
+    const response = await supabase
+        .from(TABLE)
+        .update({ 'password': newPassword })
+        .eq('id', id)
+    if (response.error) {
+        console.error('[Model Error] updatePasswordModel:', response.error)
+        throw new Error('DATABASE_ERROR')
+    }
+    return { message: 'Password Changed' }
+}
+
 export async function getallusersModel() {
     const response = await supabase
         .from(TABLE)

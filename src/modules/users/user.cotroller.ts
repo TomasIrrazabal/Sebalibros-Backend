@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserAdminWithoutPass, UserLogin, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
-import { createUserService, getAdminUserService, getallusersService, getUserService, loginUserService, updateAdminUserService, updateUserService } from "./user.services";
+import { createUserService, getAdminUserService, getallusersService, getUserService, loginUserService, updateAdminUserService, updatePasswordService, updateUserService } from "./user.services";
 
 export async function createUserController(req: Request, res: Response) {
     try {
@@ -128,6 +128,43 @@ export async function updateUserController(req: Request, res: Response) {
         }
     }
 }
+
+export async function updatePasswordController(req: Request, res: Response) {
+    try {
+        const { currentPassword, newPassword } = req.body
+
+        const user = req.user;
+
+        if (!currentPassword || !newPassword) {
+            throw new Error('BAD_REQUEST')
+        }
+        if (!user) {
+            throw new Error('BAD_REQUEST')
+        }
+        const data = await updatePasswordService(currentPassword, newPassword, user)
+
+
+        return res.status(200).json(data)
+
+    } catch (error: any) {
+        switch (error.message) {
+            case 'BAD_REQUEST':
+                return res.status(400).json({ error: 'Bad request.' })
+            case 'PASSWORD_UPDATE_FAILED':
+                return res.status(409).json({ error: 'Invalid User data.' });
+            case 'VALIDATION_ERROR':
+                return res.status(400).json({ error: 'User data not found.' });
+            case 'INVALID_PASSWORD':
+                return res.status(409).json({ error: 'Invalid Password.' });
+            case 'USER_NOT_EXIST':
+                return res.status(409).json({ error: 'The user does not exist.' });
+            default:
+                console.error('[Controller Error] updateUserController:', error)
+                return res.status(500).json({ error: 'Internal Server Error' })
+        }
+    }
+}
+
 
 export async function getallusersController(req: Request, res: Response) {
     try {
