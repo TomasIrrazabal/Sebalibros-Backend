@@ -3,18 +3,6 @@ import { User, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
 
 const TABLE = 'users'
 
-export async function createUserModel(user: UserWithoutId) {
-    const response = await supabase
-        .from(TABLE)
-        .insert(user)
-
-    if (response.status !== 201) {
-        console.error('[Model Error] createBookModel:', response.error)
-        throw new Error('DATABASE_ERROR')
-    }
-
-    return true
-}
 
 export async function getUserModel(id: number): Promise<UserWithoutPass> {
     const response = await supabase
@@ -108,7 +96,6 @@ export async function updateAdminUserModel(user: any) {
     return true
 }
 
-
 export async function deleteAdminUserModel(id: number) {
 
     const { error: deleteError, status } = await supabase
@@ -118,6 +105,19 @@ export async function deleteAdminUserModel(id: number) {
 
     if (deleteError || status !== 204) {
         console.error('[Model Error] deleteAdminUserModel:', deleteError)
+        throw new Error('DATABASE_ERROR')
+    }
+
+    return true
+}
+
+export async function createUserModel(user: UserWithoutId) {
+    const response = await supabase
+        .from(TABLE)
+        .insert(user)
+
+    if (response.status !== 201) {
+        console.error('[Model Error] createBookModel:', response.error)
         throw new Error('DATABASE_ERROR')
     }
 

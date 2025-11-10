@@ -5,30 +5,6 @@ import { generateJWT } from "./utils/jwt";
 import { userExist } from "./utils/user.utils";
 
 
-export async function createUserService(user: UserWithoutId) {
-    if (!user) {
-        throw new Error('VALIDATION_ERROR')
-    }
-
-    const exist = await userExist(user.email)
-
-    if (exist) {
-        throw new Error("USER_EXIST");
-    }
-    user.password = await hashPassword(user.password)
-
-    try {
-        await createUserModel(user)
-        return true;
-    } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR') {
-            throw new Error('USER_SAVE_FAILED')
-        }
-        throw error
-    }
-}
-
-
 
 export async function loginUserService(user: UserLogin) {
     try {
@@ -62,19 +38,15 @@ export async function loginUserService(user: UserLogin) {
     }
 }
 
-
 export async function getUserService(id: number): Promise<UserWithoutPass> {
     if (!id) {
         throw new Error('VALIDATION_ERROR')
     }
     try {
-
         const user: UserWithoutPass = await getUserModel(id)
-
         if (!user) {
             throw new Error('RESPONSE_ERROR')
         }
-
         return user;
     } catch (error: any) {
         if (error.message === 'DATABASE_ERROR') {
@@ -82,7 +54,6 @@ export async function getUserService(id: number): Promise<UserWithoutPass> {
         }
         throw error
     }
-
 }
 
 export async function updateUserService(user: UserUpdateData) {
@@ -150,7 +121,6 @@ export async function getallusersService() {
     }
 }
 
-
 export async function getAdminUserService(id: number) {
     if (id === 0) {
         throw new Error('VALIDATION_ERROR')
@@ -170,7 +140,6 @@ export async function getAdminUserService(id: number) {
         throw error
     }
 }
-
 
 export async function updateAdminUserService(user: UserAdminWithoutPass) {
     if (!user) {
@@ -203,7 +172,6 @@ export async function updateAdminUserService(user: UserAdminWithoutPass) {
     return { message: 'Success' };
 }
 
-
 export async function deleteAdminUserService(id: number) {
     if (id === 0) {
         throw new Error('VALIDATION_ERROR')
@@ -219,4 +187,27 @@ export async function deleteAdminUserService(id: number) {
     }
 
     return { message: 'Success' };
+}
+
+export async function createUserService(user: UserWithoutId) {
+    if (!user) {
+        throw new Error('VALIDATION_ERROR')
+    }
+
+    const exist = await userExist(user.email)
+
+    if (exist) {
+        throw new Error("USER_EXIST");
+    }
+    user.password = await hashPassword(user.password)
+
+    try {
+        await createUserModel(user)
+        return true;
+    } catch (error: any) {
+        if (error.message === 'DATABASE_ERROR') {
+            throw new Error('USER_SAVE_FAILED')
+        }
+        throw error
+    }
 }
