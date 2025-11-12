@@ -1,5 +1,5 @@
 import { supabase } from "../../../db/supabase";
-import { User, UserWithoutPass } from "../types";
+import { User, UserWithoutPass } from "../../../utils/user.types";
 
 
 const TABLE = 'users'
@@ -34,3 +34,4 @@ export async function getUserByIdWithoutPass(id: string) {
 
     return response.data as UserWithoutPass
 }
+

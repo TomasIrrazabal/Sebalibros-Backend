@@ -10,4 +10,3 @@ export const handleInputErrors = (req: Request, res: Response, next: NextFunctio
     }
     next()
 }
-

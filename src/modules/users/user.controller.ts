@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { UserAdminWithoutPass, UserLogin, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
-import { createUserService, deleteAdminUserService, getAdminUserService, getallusersService, getUserService, loginUserService, updateAdminUserService, updatePasswordService, updateUserService } from "./user.services";
+import { UserLogin, UserUpdateData } from "../../utils/user.types";
+import { getUserService, loginUserService, updatePasswordService, updateUserService } from "./user.services";
 
 
 export async function loginUserController(req: Request, res: Response) {
@@ -132,123 +132,7 @@ export async function updatePasswordController(req: Request, res: Response) {
             case 'USER_NOT_EXIST':
                 return res.status(409).json({ error: 'The user does not exist.' });
             default:
-                console.error('[Controller Error] updateUserController:', error)
-                return res.status(500).json({ error: 'Internal Server Error' })
-        }
-    }
-}
-
-export async function getallusersController(req: Request, res: Response) {
-    try {
-        const users = await getallusersService()
-        return res.status(200).json({ users });
-    }
-    catch (error: any) {
-        switch (error.message) {
-            case 'RESPONSE_ERROR':
-                return res.status(404).json({ error: 'Error: No Users were found.' });
-            case 'USERS_FETCH_FAILED':
-                return res.status(500).json({ error: 'Failed to fetch users.' });
-            default:
-                console.error('[Controller Error] getallusersController:', error)
-                return res.status(500).json({ error: 'Internal Server Error' })
-        }
-    }
-}
-
-export async function getAdminUserController(req: Request, res: Response) {
-    try {
-        const { id } = req.params
-
-        const user = await getAdminUserService(parseInt(id))
-        if (!user) return res.status(404).json({ message: 'No user were found.' })
-
-        return res.status(200).json({ user });
-    } catch (error: any) {
-        switch (error.message) {
-            case 'RESPONSE_ERROR':
-                return res.status(404).json({ error: 'Error: No user was found.' });
-            case 'VALIDATION_ERROR':
-                return res.status(400).json({ error: 'Invalid user data.' });
-            case 'USER_FETCH_FAILED':
-                return res.status(500).json({ error: 'Failed to fetch user.' });
-            default:
-                console.error('[Controller Error] getAdminUserController:', error)
-                return res.status(500).json({ error: 'Internal Server Error' })
-        }
-    }
-}
-
-export async function updateAdminUserController(req: Request, res: Response) {
-    try {
-        const user: UserAdminWithoutPass = req.body;
-        const result = await updateAdminUserService(user);
-
-        return res.status(200).json(result)
-    } catch (error: any) {
-
-        switch (error.message) {
-            case 'VALIDATION_ERROR':
-                return res.status(400).json({ error: 'Invalid user data.' });
-            case 'USER_UPDATE_FAILED':
-                return res.status(500).json({ error: 'Failed to update the user.' });
-            default:
-                console.error('[Controller Error] updateAdminUserController:', error)
-                return res.status(500).json({ error: 'Internal Server Error' })
-        }
-
-
-    }
-}
-
-export async function deleteAdminUserController(req: Request, res: Response) {
-    try {
-        const { id } = req.params
-
-        await deleteAdminUserService(parseInt(id))
-
-        return res.status(204).send()
-
-    } catch (error: any) {
-
-        switch (error.message) {
-            case 'VALIDATION_ERROR':
-                return res.status(400).json({ error: 'Invalid user data.' });
-            case 'USER_DELETION_FAILED':
-                return res.status(500).json({ error: 'Failed to delete the user.' });
-            default:
-                console.error('[Controller Error] deleteAdminUserController:', error)
-                return res.status(500).json({ error: 'Internal Server Error' })
-        }
-
-
-    }
-
-
-}
-
-export async function createUserController(req: Request, res: Response) {
-    try {
-        const user: UserWithoutId = {
-            email: req.body.email,
-            name: req.body.name,
-            password: req.body.password,
-            role: req.body.role
-        }
-        await createUserService(user)
-
-        return res.status(201).json({ data: 'User created successfully.' })
-
-    } catch (error: any) {
-        switch (error.message) {
-            case 'USER_EXIST':
-                return res.status(409).json({ error: 'A user with that email is already registered.' })
-            case 'VALIDATION_ERROR':
-                return res.status(400).json({ error: 'Invalid User data.' });
-            case 'USER_SAVE_FAILED':
-                return res.status(500).json({ error: 'Failed to save user.' });
-            default:
-                console.error('[Controller Error] createuserController:', error)
+                console.error('[Controller Error] updatePasswordController:', error)
                 return res.status(500).json({ error: 'Internal Server Error' })
         }
     }

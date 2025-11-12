@@ -1,7 +1,7 @@
 
 import { isImageSaved } from "./utils/image.utils";
 import { createBookModel, deleteBookModel, deleteImageModel, getABookModel, getAllBooksModel, updateBookModel } from "./book.model";
-import { Book, BookUpdate, BookWhitoutID } from "./types";
+import { Book, BookUpdate, BookWhitoutID } from "../../utils/book.types";
 
 export async function getAllBooksService(): Promise<Book[]> {
     try {
