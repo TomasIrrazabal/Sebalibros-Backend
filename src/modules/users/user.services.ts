@@ -1,7 +1,7 @@
-import { id, JwtPayload, User, UserAdminWithoutPass, UserLogin, UserUpdateData, UserWithoutId, UserWithoutPass } from "./types";
-import { createUserModel, deleteAdminUserModel, getAdminUserModel, getallusersModel, getUserModel, updateAdminUserModel, updatePasswordModel, updateUserModel } from "./user.model";
-import { checkPassword, hashPassword } from "./utils/auth";
-import { generateJWT } from "./utils/jwt";
+import { JwtPayload, UserLogin, UserUpdateData, UserWithoutPass } from "../../utils/user.types";
+import { getUserModel, updatePasswordModel, updateUserModel } from "./user.model";
+import { checkPassword, hashPassword } from "../../utils/auth";
+import { generateJWT } from "../../middleware/jwt";
 import { userExist } from "./utils/user.utils";
 
 
@@ -100,113 +100,6 @@ export async function updatePasswordService(currentPassword: string, newPassword
     } catch (error: any) {
         if (error.message === 'DATABASE_ERROR') {
             throw new Error('PASSWORD_UPDATE_FAILED')
-        }
-        throw error
-    }
-}
-
-export async function getallusersService() {
-    try {
-
-        const users: User[] = await getallusersModel()
-        if (users.length === 0) {
-            throw new Error('RESPONSE_ERROR')
-        }
-        return users;
-    } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR') {
-            throw new Error('USERS_FETCH_FAILED')
-        }
-        throw error
-    }
-}
-
-export async function getAdminUserService(id: number) {
-    if (id === 0) {
-        throw new Error('VALIDATION_ERROR')
-    }
-    try {
-
-        const user: UserWithoutPass = await getAdminUserModel(id)
-        if (!user) {
-            throw new Error('RESPONSE_ERROR')
-        }
-
-        return user;
-    } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR') {
-            throw new Error('USER_FETCH_FAILED')
-        }
-        throw error
-    }
-}
-
-export async function updateAdminUserService(user: UserAdminWithoutPass) {
-    if (!user) {
-        throw new Error('VALIDATION_ERROR')
-    }
-    try {
-        const updateData: any = {
-            id: user.id
-        };
-        if (user.name) {
-            updateData.name = user.name
-        }
-        if (user.email) {
-            updateData.email = user.email
-        }
-        if (user.role) {
-            updateData.role = user.role
-        }
-
-        if (user.resetPass === true) {
-            updateData.password = await hashPassword('12345678');
-        }
-        await updateAdminUserModel(updateData)
-    } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR') {
-            throw new Error('USER_UPDATE_FAILED')
-        }
-        throw error
-    }
-    return { message: 'Success' };
-}
-
-export async function deleteAdminUserService(id: number) {
-    if (id === 0) {
-        throw new Error('VALIDATION_ERROR')
-    }
-
-    try {
-        await deleteAdminUserModel(id)
-    } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR' || error.mensaje === 'USER_NOT_FOUND') {
-            throw new Error('USER_DELETION_FAILED')
-        }
-        throw error
-    }
-
-    return { message: 'Success' };
-}
-
-export async function createUserService(user: UserWithoutId) {
-    if (!user) {
-        throw new Error('VALIDATION_ERROR')
-    }
-
-    const exist = await userExist(user.email)
-
-    if (exist) {
-        throw new Error("USER_EXIST");
-    }
-    user.password = await hashPassword(user.password)
-
-    try {
-        await createUserModel(user)
-        return true;
-    } catch (error: any) {
-        if (error.message === 'DATABASE_ERROR') {
-            throw new Error('USER_SAVE_FAILED')
         }
         throw error
     }

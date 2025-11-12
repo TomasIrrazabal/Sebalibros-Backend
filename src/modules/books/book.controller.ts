@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { createBookService, deleteBookService, deleteImageService, getABookService, getAllBooksService, updateBookService } from "./book.services";
-import { BookUpdate, BookWhitoutID } from "./types";
+import { BookUpdate, BookWhitoutID } from "../../utils/book.types";
 
 export async function getBooksController(_req: Request, res: Response) {
     try {

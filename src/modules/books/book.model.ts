@@ -1,5 +1,5 @@
 import { supabase } from "../../db/supabase";
-import type { Book, BookUpdate, BookWhitoutID } from "./types";
+import type { Book, BookUpdate, BookWhitoutID } from "../../utils/book.types";
 
 const TABLE = 'books';
 const BUCKET = process.env.SUPABASE_BUCKET || 'imagenes-libros'
