@@ -14,11 +14,10 @@ const router = express.Router()
 router.post('/login',
     body('email')
         .isEmail()
-        .withMessage('E-mail no valido'),
+        .withMessage('Invalid email.'),
     body('password')
         .notEmpty()
         .withMessage('The password is required.'),
-    handleInputErrors,
     loginUserController
 )
 
