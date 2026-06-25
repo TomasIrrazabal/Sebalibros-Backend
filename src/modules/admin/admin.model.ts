@@ -1,75 +1,63 @@
-import { supabase } from "../../db/supabase";
+import { pool } from "../../db/pool";
+import { buildInsert, buildUpdate } from "../../db/sql";
 import { User, UserWithoutId, UserWithoutPass } from "../../utils/user.types";
 
 const TABLE = 'users'
 
 
 export async function admin_getallusersModel() {
-    const response = await supabase
-        .from(TABLE)
-        .select('*')
-        .order('id', { ascending: true })
-
-    if (response.status !== 200) {
-        console.error('[Model Error] getallusersModel:', response.error)
+    try {
+        const { rows } = await pool.query<User>(
+            `SELECT * FROM "${TABLE}" ORDER BY "id" ASC`
+        )
+        return rows;
+    } catch (error) {
+        console.error('[Model Error] getallusersModel:', error)
         throw new Error('DATABASE_ERROR')
     }
-    return response.data as User[];
 }
 
 export async function admin_getUserModel(id: number) {
-    const response = await supabase
-        .from(TABLE)
-        .select('id,name,email,role')
-        .eq('id', id)
-        .single()
-
-    if (response.status !== 200) {
-        console.error('[Model Error] getABookModel:', response.error)
+    try {
+        const { rows } = await pool.query<UserWithoutPass>(
+            `SELECT "id", "name", "email", "role" FROM "${TABLE}" WHERE "id" = $1`,
+            [id]
+        )
+        return rows[0] as UserWithoutPass;
+    } catch (error) {
+        console.error('[Model Error] admin_getUserModel:', error)
         throw new Error('DATABASE_ERROR')
     }
-
-    return response.data as UserWithoutPass;
 }
 
 export async function admin_updateUserModel(user: any) {
-    const response = await supabase
-        .from(TABLE)
-        .update(user)
-        .eq('id', user.id)
-
-    if (response.error) {
-        console.error('[Model Error] updateAdminUserModel:', response.error)
+    try {
+        const { text, values } = buildUpdate(TABLE, user)
+        await pool.query(text, values)
+        return true
+    } catch (error) {
+        console.error('[Model Error] admin_updateUserModel:', error)
         throw new Error('DATABASE_ERROR')
     }
-    return true
 }
 
 export async function admin_createUserModel(user: UserWithoutId) {
-    const response = await supabase
-        .from(TABLE)
-        .insert(user)
-
-    if (response.status !== 201) {
-        console.error('[Model Error] createBookModel:', response.error)
+    try {
+        const { text, values } = buildInsert(TABLE, user)
+        await pool.query(text, values)
+        return true
+    } catch (error) {
+        console.error('[Model Error] admin_createUserModel:', error)
         throw new Error('DATABASE_ERROR')
     }
-
-    return true
 }
 
 export async function admin_deleteUserModel(id: number) {
-
-    const { error: deleteError, status } = await supabase
-        .from(TABLE)
-        .delete()
-        .eq('id', id)
-
-    if (deleteError || status !== 204) {
-        console.error('[Model Error] deleteAdminUserModel:', deleteError)
+    try {
+        await pool.query(`DELETE FROM "${TABLE}" WHERE "id" = $1`, [id])
+        return true
+    } catch (error) {
+        console.error('[Model Error] admin_deleteUserModel:', error)
         throw new Error('DATABASE_ERROR')
     }
-
-    return true
 }
-

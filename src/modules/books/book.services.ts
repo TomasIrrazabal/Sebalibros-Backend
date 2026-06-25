@@ -21,7 +21,7 @@ export async function getAllBooksService(): Promise<Book[]> {
 
 
 export async function getABookService(id: number): Promise<Book> {
-    if (id === 0) {
+    if (!Number.isInteger(id) || id <= 0) {
         throw new Error('VALIDATION_ERROR')
     }
     try {
@@ -71,7 +71,7 @@ export async function updateBookService(updateBook: BookUpdate) {
 }
 
 export async function deleteBookService(id: number) {
-    if (id === 0) {
+    if (!Number.isInteger(id) || id <= 0) {
         throw new Error('VALIDATION_ERROR')
     }
 

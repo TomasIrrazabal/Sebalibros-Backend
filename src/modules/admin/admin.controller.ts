@@ -23,9 +23,12 @@ export async function admin_getallusersController(req: Request, res: Response) {
 
 export async function admin_getUserController(req: Request, res: Response) {
     try {
-        const { id } = req.params
+        const id = Number(req.params.id)
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({ error: 'Invalid user id.' })
+        }
 
-        const user = await admin_getUserService(parseInt(id))
+        const user = await admin_getUserService(id)
         if (!user) return res.status(404).json({ message: 'No user were found.' })
 
         return res.status(200).json({ user });
@@ -100,9 +103,12 @@ export async function admin_createUserController(req: Request, res: Response) {
 
 export async function admin_deleteUserController(req: Request, res: Response) {
     try {
-        const { id } = req.params
+        const id = Number(req.params.id)
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({ error: 'Invalid user id.' })
+        }
 
-        await admin_deleteUserService(parseInt(id))
+        await admin_deleteUserService(id)
 
         return res.status(204).send()
 
