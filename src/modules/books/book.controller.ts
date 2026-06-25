@@ -22,9 +22,12 @@ export async function getBooksController(_req: Request, res: Response) {
 
 export async function getABookController(req: Request, res: Response) {
     try {
-        const { id } = req.params
+        const id = Number(req.params.id)
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({ error: 'Invalid book id.' })
+        }
 
-        const book = await getABookService(parseInt(id))
+        const book = await getABookService(id)
         if (!book) return res.status(404).json({ message: 'No books were found.' })
 
         return res.status(200).json({ book });
@@ -98,9 +101,12 @@ export async function updateBookController(req: Request, res: Response) {
 
 export async function deleteBookController(req: Request, res: Response) {
     try {
-        const { id } = req.params
+        const id = Number(req.params.id)
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({ error: 'Invalid book id.' })
+        }
 
-        await deleteBookService(parseInt(id))
+        await deleteBookService(id)
 
         return res.status(204).send()
     } catch (error: any) {

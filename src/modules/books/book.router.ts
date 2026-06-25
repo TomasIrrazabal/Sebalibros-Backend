@@ -1,5 +1,12 @@
 import express from 'express'
-import { createBookController, deleteBookController, deleteImageController, getABookController, getBooksController, updateBookController } from './book.controller'
+import {
+    createBookController,
+    deleteBookController,
+    deleteImageController,
+    getABookController,
+    getBooksController,
+    updateBookController
+} from './book.controller'
 import { uploadImageMiddleware } from './middleware/image.middleware'
 import { uploadSingleImage } from '../../config/multerConfig'
 import { requireAuth, requireRole } from '../../middleware/jwt'
@@ -7,40 +14,49 @@ import { Role } from '../../utils/user.types'
 
 const router = express.Router()
 
-// Public (sin autenticación)
+// ---------------------------------------------------------------------------
+// Public routes (no authentication)
+// ---------------------------------------------------------------------------
 
-router.get('/books',
-    getBooksController
+router.get('/books', getBooksController)
 
-)
+router.get('/books/:id', getABookController)
 
-router.get('/books/:id',
-    getABookController
-)
+// ---------------------------------------------------------------------------
+// Admin routes (authentication + admin role)
+// ---------------------------------------------------------------------------
 
-
-
-// Admin (autenticación + rol admin)
-router.post('/admin/book',
+router.post(
+    '/admin/book',
+    requireAuth,
+    requireRole(Role.admin),
     uploadSingleImage,
     uploadImageMiddleware,
     createBookController
 )
 
-router.patch('/admin/book/',
+router.patch(
+    '/admin/book',
+    requireAuth,
+    requireRole(Role.admin),
     uploadSingleImage,
     uploadImageMiddleware,
     deleteImageController,
     updateBookController
 )
 
-router.delete('/admin/book/:id',
+router.delete(
+    '/admin/book/:id',
+    requireAuth,
+    requireRole(Role.admin),
     deleteBookController
 )
 
-router.delete('/image',
+router.delete(
+    '/image',
+    requireAuth,
+    requireRole(Role.admin),
     deleteImageController
 )
-
 
 export default router

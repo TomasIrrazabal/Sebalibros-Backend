@@ -4,10 +4,6 @@ import cookieParser from 'cookie-parser'
 
 
 import { corsConfig } from "./config/cors"
-import { swaggerSpec } from "./modules/docs/swagger";
-import { requireAuth, requireRole } from "./middleware/jwt"
-import { Role } from "./utils/user.types"
-
 
 import bookRouter from "./modules/books/book.router"
 import userRouter from "./modules/users/user.router"
@@ -27,17 +23,13 @@ app.use(cookieParser())
 const apiV = `/api/v1`
 
 // Routers
+// Each router applies its own auth/role guards per route.
 
 app.use('/docs', docsRouter)
-app.use(apiV + '/admin', requireAuth, requireRole(Role.admin))
-app.use(apiV + '/image', requireAuth, requireRole(Role.admin))
-
 
 app.use(apiV, bookRouter)
 app.use(apiV, userRouter)
-
 app.use(apiV, adminRouter)
-
 
 app.use((_req, res) => {
     res.status(404).json({ error: 'URL not found' });

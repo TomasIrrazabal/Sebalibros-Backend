@@ -22,7 +22,7 @@ export async function admin_getallusersService() {
 }
 
 export async function admin_getUserService(id: number) {
-    if (id === 0) {
+    if (!Number.isInteger(id) || id <= 0) {
         throw new Error('VALIDATION_ERROR')
     }
     try {
@@ -96,7 +96,7 @@ export async function admin_createUserService(user: UserWithoutId) {
 }
 
 export async function admin_deleteUserService(id: number) {
-    if (id === 0) {
+    if (!Number.isInteger(id) || id <= 0) {
         throw new Error('VALIDATION_ERROR')
     }
 
